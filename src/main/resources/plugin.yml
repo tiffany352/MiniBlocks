@@ -1,0 +1,6 @@
+name: MiniBlocks
+version: ${project.version}
+main: com.tiffnix.miniblocks.MiniBlocks
+api-version: 1.16
+authors: [ Tiffnix ]
+description: A port of VanillaTweaks' player heads data packs to Spigot
