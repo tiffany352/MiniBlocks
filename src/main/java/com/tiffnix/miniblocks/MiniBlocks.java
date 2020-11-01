@@ -1,6 +1,12 @@
 package com.tiffnix.miniblocks;
 
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTContainer;
+import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -18,6 +24,7 @@ public final class MiniBlocks extends JavaPlugin {
     public static MiniBlocks INSTANCE;
     public static TradesTable TRADES;
     public static NamespacedKey TRADES_PRESENT;
+    public static NamespacedKey ORIGINAL_NAME;
 
     /**
      * Returns true if the entity is a wandering trader which hasn't yet been populated with mini blocks trades.
@@ -63,11 +70,44 @@ public final class MiniBlocks extends JavaPlugin {
         }
     }
 
+    public static boolean isPlayerHead(BlockState state) {
+        return state.getType() == Material.PLAYER_HEAD || state.getType() == Material.PLAYER_WALL_HEAD;
+    }
+
+    public static void retrieveOriginalName(BlockState state, ItemStack dest) {
+        if (state instanceof TileState) {
+            TileState tileState = (TileState) state;
+            String original = tileState.getPersistentDataContainer().getOrDefault(ORIGINAL_NAME, PersistentDataType.STRING, "");
+            NBTContainer displayTag = new NBTContainer(original);
+
+            NBTItem nbtItem = new NBTItem(dest);
+            NBTCompound display = nbtItem.addCompound("display");
+            display.mergeCompound(displayTag);
+            nbtItem.applyNBT(dest);
+        }
+    }
+
+    public static void storeOriginalName(BlockState state, ItemStack source) {
+        if (state instanceof TileState) {
+            TileState tileState = (TileState) state;
+            NBTItem nbtItem = new NBTItem(source);
+            NBTCompound itemDisplay = nbtItem.getCompound("display");
+            String name = itemDisplay != null ? itemDisplay.toString() : null;
+            INSTANCE.getLogger().info("storing tag: " + name);
+            if (name != null) {
+                tileState.getPersistentDataContainer().set(ORIGINAL_NAME, PersistentDataType.STRING, name);
+            }
+        } else {
+            INSTANCE.getLogger().warning(state.toString() + " is missing a corresponding tile entity");
+        }
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
         INSTANCE = this;
         TRADES_PRESENT = new NamespacedKey(this, "trades_present");
+        ORIGINAL_NAME = new NamespacedKey(this, "original_name");
 
         reload();
         getLogger().info("Registered " + TRADES.size() + " trades for the Wandering Trader.");
