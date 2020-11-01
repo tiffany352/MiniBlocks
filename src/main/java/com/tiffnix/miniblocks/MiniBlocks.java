@@ -116,6 +116,9 @@ public final class MiniBlocks extends JavaPlugin {
             TileState tileState = (TileState) state;
             String original = tileState.getPersistentDataContainer().getOrDefault(ORIGINAL_NAME,
                     PersistentDataType.STRING, "");
+            if (original.isEmpty() || original.equals("null")) {
+                return;
+            }
             NBTContainer displayTag = new NBTContainer(original);
 
             NBTItem nbtItem = new NBTItem(dest);
