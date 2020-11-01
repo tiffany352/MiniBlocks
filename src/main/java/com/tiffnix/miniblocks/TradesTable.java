@@ -68,11 +68,11 @@ public class TradesTable {
             NBTContainer compound = new NBTContainer(nbtText);
             ItemStack sell = NBTItem.convertNBTtoItem(compound);
 
-            int uses = 1;
+            int uses;
             if (isHermitHead) {
                 uses = MiniBlocks.INSTANCE.traderPlayerMaxTrades;
             } else {
-                uses = MiniBlocks.INSTANCE.traderMiniBlocksMaxTrades;;
+                uses = MiniBlocks.INSTANCE.traderMiniBlocksMaxTrades;
             }
 
             entries.add(new TradeEntry(buy1, buy2, sell, uses));

@@ -18,7 +18,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -28,23 +27,6 @@ public final class MiniBlocks extends JavaPlugin {
     public static TradesTable TRADES;
     public static NamespacedKey TRADES_PRESENT;
     public static NamespacedKey ORIGINAL_NAME;
-
-    public enum LootDropPolicy {
-        Always, PlayerKill, Never;
-
-        public static LootDropPolicy fromString(String value) {
-            if (value == null) {
-                return LootDropPolicy.Never;
-            }
-            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) {
-                return LootDropPolicy.Always;
-            } else if (value.equalsIgnoreCase("player-kill")) {
-                return LootDropPolicy.PlayerKill;
-            } else {
-                return LootDropPolicy.Never;
-            }
-        }
-    }
 
     public static class CustomPlayer {
         final String name;
@@ -59,19 +41,6 @@ public final class MiniBlocks extends JavaPlugin {
     // Head name fix
     boolean fixPlayerHeadNames = false;
     boolean fixMobHeadNames = false;
-
-    // Player heads
-    LootDropPolicy dropPlayerHeads = LootDropPolicy.Never;
-    String playerHeadNameFormat = null;
-    List<String> playerHeadLoreFormat = null;
-    float playerHeadDropChance = 100;
-    boolean playerHeadRespectLooting = false;
-
-    // Mob heads
-    LootDropPolicy dropMobHeads = LootDropPolicy.Never;
-    float mobHeadDropChance = 1;
-    boolean mobHeadRespectLooting = false;
-    HashSet<EntityType> mobHeadExclude = new HashSet<>();
 
     // Wandering trader
     int traderMinOffers = 3;
@@ -196,18 +165,6 @@ public final class MiniBlocks extends JavaPlugin {
 
         fixPlayerHeadNames = config.getBoolean("head-name-fix.player-heads", true);
         fixMobHeadNames = config.getBoolean("head-name-fix.mob-heads", true);
-
-        dropPlayerHeads = LootDropPolicy.fromString(config.getString("player-heads.enabled", "true"));
-        playerHeadNameFormat = config.getString("player-heads.name-format", "§r§e%player_name%'s Head");
-        playerHeadLoreFormat = config.getStringList("player-heads.lore-format");
-        playerHeadDropChance = (float) config.getDouble("player-heads.drop-chance", 100);
-        playerHeadRespectLooting = config.getBoolean("player-heads.looting", false);
-
-        dropMobHeads = LootDropPolicy.fromString(config.getString("mob-heads.enabled", "true"));
-        mobHeadDropChance = (float) config.getDouble("mob-heads.drop-chance", 1);
-        mobHeadRespectLooting = config.getBoolean("mob-heads.looting", true);
-        mobHeadExclude = config.getStringList("mob-heads.exclude").stream().map(EntityType::valueOf)
-                .collect(Collectors.toCollection(HashSet::new));
 
         traderMinOffers = config.getInt("wandering-trader.min-offers", 3);
         traderMaxOffers = config.getInt("wandering-trader.max-offers", 5);

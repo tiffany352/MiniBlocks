@@ -6,44 +6,6 @@ head-name-fix:
   # Enable the fix for other types of heads, such as creeper, zombie, skeleton, etc. Mainly useful when renaming heads manually in an anvil.
   mob-heads: true
 
-# Killing players produces player heads as loot drops.
-player-heads:
-  # Possible values:
-  # * true (always drop player head on death)
-  # * player-kill (only drop when killed by another player)
-  # * false (never drop player head)
-  enabled: player-kill
-
-  # The format used for naming the item. By default matches Vanilla Tweaks behavior.
-  name-format: §r§e%player_name%'s Head
-
-  # Format for lore text. By default matches Vanilla Tweaks behavior.
-  lore-format:
-    - §rKilled by §e%killer_name%
-
-  # Percent chance of getting the drop. By default, you always get one.
-  drop-chance: 100
-
-  # Whether chance is affected by Looting enchantments.
-  looting: false
-
-# Killing mobs produces heads as loot drops.
-mob-heads:
-  # Same as above. By default, only drops when killed by a player, similar to blaze rods.
-  enabled: player-kill
-
-  # Percent chance of getting the drop. By default, 1% chance.
-  drop-chance: 1
-
-  # Whether chances are improved by Looting enchantments.
-  looting: true
-
-  # Uncomment to exclude certain mobs from being able to have their heads drop.
-
-  #exclude:
-  #  - sheep
-  #  - cow
-
 wandering-trader:
   # How many offers should be added to each wandering trader's list.
   min-offers: 5
