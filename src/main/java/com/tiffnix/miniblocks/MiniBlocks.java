@@ -131,7 +131,6 @@ public final class MiniBlocks extends JavaPlugin {
             NBTItem nbtItem = new NBTItem(source);
             NBTCompound itemDisplay = nbtItem.getCompound("display");
             String name = itemDisplay != null ? itemDisplay.toString() : null;
-            INSTANCE.getLogger().info("storing tag: " + name);
             if (name != null) {
                 tileState.getPersistentDataContainer().set(ORIGINAL_NAME, PersistentDataType.STRING, name);
             }
