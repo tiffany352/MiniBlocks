@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -17,8 +18,10 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public final class MiniBlocks extends JavaPlugin {
     public static MiniBlocks INSTANCE;
@@ -26,16 +29,71 @@ public final class MiniBlocks extends JavaPlugin {
     public static NamespacedKey TRADES_PRESENT;
     public static NamespacedKey ORIGINAL_NAME;
 
+    public enum LootDropPolicy {
+        Always, PlayerKill, Never;
+
+        public static LootDropPolicy fromString(String value) {
+            if (value == null) {
+                return LootDropPolicy.Never;
+            }
+            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) {
+                return LootDropPolicy.Always;
+            } else if (value.equalsIgnoreCase("player-kill")) {
+                return LootDropPolicy.PlayerKill;
+            } else {
+                return LootDropPolicy.Never;
+            }
+        }
+    }
+
+    public static class CustomPlayer {
+        final String name;
+        final String uuid;
+
+        public CustomPlayer(String name, String uuid) {
+            this.name = name;
+            this.uuid = uuid;
+        }
+    }
+
+    // Head name fix
+    boolean fixPlayerHeadNames = false;
+    boolean fixMobHeadNames = false;
+
+    // Player heads
+    LootDropPolicy dropPlayerHeads = LootDropPolicy.Never;
+    String playerHeadNameFormat = null;
+    List<String> playerHeadLoreFormat = null;
+    float playerHeadDropChance = 100;
+    boolean playerHeadRespectLooting = false;
+
+    // Mob heads
+    LootDropPolicy dropMobHeads = LootDropPolicy.Never;
+    float mobHeadDropChance = 1;
+    boolean mobHeadRespectLooting = false;
+    HashSet<EntityType> mobHeadExclude = new HashSet<>();
+
+    // Wandering trader
+    int traderMinOffers = 3;
+    int traderMaxOffers = 5;
+    int traderPlayerMaxTrades = 3;
+    boolean traderHermitCraft = false;
+    ArrayList<CustomPlayer> traderCustomPlayers = new ArrayList<>();
+    boolean traderMiniBlocks = true;
+    int traderMiniBlocksMaxTrades = 1;
+
     /**
-     * Returns true if the entity is a wandering trader which hasn't yet been populated with mini blocks trades.
+     * Returns true if the entity is a wandering trader which hasn't yet been
+     * populated with mini blocks trades.
      *
      * @param entity Any entity
      */
     public static boolean isFreshTrader(Entity entity) {
-        return entity != null && entity.getType() == EntityType.WANDERING_TRADER && !entity.getPersistentDataContainer().has(TRADES_PRESENT, PersistentDataType.BYTE);
+        return entity != null && entity.getType() == EntityType.WANDERING_TRADER
+                && !entity.getPersistentDataContainer().has(TRADES_PRESENT, PersistentDataType.BYTE);
     }
 
-    public static void populateTrades(Merchant merchant) {
+    public void populateTrades(Merchant merchant) {
         HumanEntity trader = merchant.getTrader();
         if (trader != null && trader.getPersistentDataContainer().has(TRADES_PRESENT, PersistentDataType.BYTE)) {
             return;
@@ -45,15 +103,13 @@ public final class MiniBlocks extends JavaPlugin {
         ArrayList<MerchantRecipe> recipes = new ArrayList<>();
 
         Random random = new Random();
-        // Choose a count between 3 and 5 trades to show.
-        // TODO: Make configurable.
-        int recipeCount = random.nextInt(2) + 3;
+        int recipeCount = random.nextInt(traderMaxOffers - traderMinOffers) + traderMinOffers;
         TradesTable.TradeEntry[] trades = TRADES.getRandomTrades(recipeCount, random);
 
         recipes.ensureCapacity(originalRecipes.size() + recipeCount);
 
         for (TradesTable.TradeEntry entry : trades) {
-            MerchantRecipe recipe = new MerchantRecipe(entry.sell, 1);
+            MerchantRecipe recipe = new MerchantRecipe(entry.sell, entry.uses);
             if (entry.buy1 != null && !entry.buy1.isAir()) {
                 recipe.addIngredient(new ItemStack(entry.buy1, 1));
             }
@@ -70,14 +126,27 @@ public final class MiniBlocks extends JavaPlugin {
         }
     }
 
-    public static boolean isPlayerHead(BlockState state) {
-        return state.getType() == Material.PLAYER_HEAD || state.getType() == Material.PLAYER_WALL_HEAD;
+    public static boolean isPlayerHead(Material mat) {
+        return mat == Material.PLAYER_HEAD || mat == Material.PLAYER_WALL_HEAD;
+    }
+
+    public static boolean isMobHead(Material mat) {
+        return mat == Material.SKELETON_SKULL || mat == Material.WITHER_SKELETON_SKULL || mat == Material.PLAYER_HEAD
+                || mat == Material.ZOMBIE_HEAD || mat == Material.CREEPER_HEAD || mat == Material.DRAGON_HEAD
+                || mat == Material.SKELETON_WALL_SKULL || mat == Material.WITHER_SKELETON_WALL_SKULL
+                || mat == Material.PLAYER_WALL_HEAD || mat == Material.ZOMBIE_WALL_HEAD
+                || mat == Material.CREEPER_WALL_HEAD || mat == Material.DRAGON_WALL_HEAD;
+    }
+
+    public boolean isHeadToApplyFixTo(Material mat) {
+        return fixPlayerHeadNames && isPlayerHead(mat) || fixMobHeadNames && isMobHead(mat);
     }
 
     public static void retrieveOriginalName(BlockState state, ItemStack dest) {
         if (state instanceof TileState) {
             TileState tileState = (TileState) state;
-            String original = tileState.getPersistentDataContainer().getOrDefault(ORIGINAL_NAME, PersistentDataType.STRING, "");
+            String original = tileState.getPersistentDataContainer().getOrDefault(ORIGINAL_NAME,
+                    PersistentDataType.STRING, "");
             NBTContainer displayTag = new NBTContainer(original);
 
             NBTItem nbtItem = new NBTItem(dest);
@@ -109,6 +178,8 @@ public final class MiniBlocks extends JavaPlugin {
         TRADES_PRESENT = new NamespacedKey(this, "trades_present");
         ORIGINAL_NAME = new NamespacedKey(this, "original_name");
 
+        this.saveDefaultConfig();
+
         reload();
         getLogger().info("Registered " + TRADES.size() + " trades for the Wandering Trader.");
 
@@ -121,7 +192,35 @@ public final class MiniBlocks extends JavaPlugin {
     }
 
     public void reload() {
+        FileConfiguration config = getConfig();
+
+        fixPlayerHeadNames = config.getBoolean("head-name-fix.player-heads", true);
+        fixMobHeadNames = config.getBoolean("head-name-fix.mob-heads", true);
+
+        dropPlayerHeads = LootDropPolicy.fromString(config.getString("player-heads.enabled", "true"));
+        playerHeadNameFormat = config.getString("player-heads.name-format", "§r§e%player_name%'s Head");
+        playerHeadLoreFormat = config.getStringList("player-heads.lore-format");
+        playerHeadDropChance = (float) config.getDouble("player-heads.drop-chance", 100);
+        playerHeadRespectLooting = config.getBoolean("player-heads.looting", false);
+
+        dropMobHeads = LootDropPolicy.fromString(config.getString("mob-heads.enabled", "true"));
+        mobHeadDropChance = (float) config.getDouble("mob-heads.drop-chance", 1);
+        mobHeadRespectLooting = config.getBoolean("mob-heads.looting", true);
+        mobHeadExclude = config.getStringList("mob-heads.exclude").stream().map(EntityType::valueOf)
+                .collect(Collectors.toCollection(HashSet::new));
+
+        traderMinOffers = config.getInt("wandering-trader.min-offers", 3);
+        traderMaxOffers = config.getInt("wandering-trader.max-offers", 5);
+        traderPlayerMaxTrades = config.getInt("wandering-trader.player-heads.max-trades", 3);
+        traderHermitCraft = config.getBoolean("wandering-trader.player-heads.hermit-craft-members", false);
+        traderCustomPlayers = config.getMapList("wandering-trader.player-heads.custom-members").stream()
+                .map(map -> new CustomPlayer((String) map.get("name"), (String) map.get("uuid")))
+                .collect(Collectors.toCollection(ArrayList::new));
+        traderMiniBlocks = config.getBoolean("wandering-trader.mini-blocks.enabled", true);
+        traderMiniBlocksMaxTrades = config.getInt("wandering-trader.mini-blocks.max-trades", 1);
+
         TRADES = new TradesTable();
-        TRADES.addDefaults();
+        TRADES.addDefaults(traderHermitCraft, traderMiniBlocks);
+        TRADES.addPlayerHeads(traderCustomPlayers);
     }
 }

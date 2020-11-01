@@ -1,6 +1,5 @@
 package com.tiffnix.miniblocks;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
@@ -21,15 +20,19 @@ public class PluginListener implements Listener {
         if (MiniBlocks.isFreshTrader(entity)) {
             WanderingTrader trader = (WanderingTrader) entity;
 
-            MiniBlocks.populateTrades(trader);
+            MiniBlocks.INSTANCE.populateTrades(trader);
         }
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (!MiniBlocks.INSTANCE.fixPlayerHeadNames && !MiniBlocks.INSTANCE.fixMobHeadNames) {
+            return;
+        }
+
         final Block block = event.getBlockPlaced();
         final BlockState state = block.getState();
-        if (MiniBlocks.isPlayerHead(state)) {
+        if (MiniBlocks.INSTANCE.isHeadToApplyFixTo(state.getType())) {
             MiniBlocks.storeOriginalName(state, event.getItemInHand());
             state.update();
         }
@@ -37,11 +40,15 @@ public class PluginListener implements Listener {
 
     @EventHandler
     public void onBlockDropItem(BlockDropItemEvent event) {
+        if (!MiniBlocks.INSTANCE.fixPlayerHeadNames && !MiniBlocks.INSTANCE.fixMobHeadNames) {
+            return;
+        }
+
         final BlockState beforeBreak = event.getBlockState();
-        if (MiniBlocks.isPlayerHead(beforeBreak)) {
+        if (MiniBlocks.INSTANCE.isHeadToApplyFixTo(beforeBreak.getType())) {
             for (Item item : event.getItems()) {
                 final ItemStack stack = item.getItemStack();
-                if (stack.getType() == Material.PLAYER_HEAD) {
+                if (MiniBlocks.INSTANCE.isHeadToApplyFixTo(stack.getType())) {
                     MiniBlocks.retrieveOriginalName(beforeBreak, stack);
                     item.setItemStack(stack);
                     break;
