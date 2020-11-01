@@ -6,3 +6,12 @@ authors: [ Tiffnix ]
 depend:
   - NBTAPI
 description: A port of VanillaTweaks' player heads data packs to Spigot
+commands:
+  miniblocks:
+    description: Manage the MiniBlocks configuration
+    usage: /miniblocks reload
+    permission: miniblocks.manage
+permissions:
+  miniblocks.manage:
+    description: Allows changing MiniBlocks config using /miniblocks command
+    default: op

@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -155,6 +156,8 @@ public final class MiniBlocks extends JavaPlugin {
         getLogger().info("Registered " + TRADES.size() + " trades for the Wandering Trader.");
 
         getServer().getPluginManager().registerEvents(new PluginListener(), this);
+
+        Objects.requireNonNull(this.getCommand("miniblocks")).setExecutor(new MiniBlockCommand());
     }
 
     @Override
