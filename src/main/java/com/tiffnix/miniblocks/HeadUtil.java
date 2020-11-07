@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
@@ -44,7 +45,13 @@ public class HeadUtil {
                     JsonObject property = item.getAsJsonObject();
                     JsonElement name = property.get("name");
                     if (name != null && name.getAsString().equalsIgnoreCase("textures")) {
-                        String result = property.get("value").getAsString();
+                        // The timestamp field needs to be removed so that heads will stack across server restarts.
+                        String base64 = property.get("value").getAsString();
+                        String json = new String(Base64.decode(base64), StandardCharsets.UTF_8);
+                        JsonObject texture = gson.fromJson(json, JsonObject.class);
+                        texture.remove("timestamp");
+                        String newJson = gson.toJson(texture);
+                        String result = Base64.encode(newJson.getBytes(StandardCharsets.UTF_8));
                         playerSkinCache.put(uuid, result);
                         return result;
                     }
