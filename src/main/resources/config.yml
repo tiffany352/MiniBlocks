@@ -6,6 +6,12 @@ head-name-fix:
   # Enable the fix for other types of heads, such as creeper, zombie, skeleton, etc. Mainly useful when renaming heads manually in an anvil.
   mob-heads: true
 
+player-heads:
+  enabled: true
+  name-format: §r§e%player_name%'s Head
+  lore-format:
+    - Killed by §r§e%killer_name%
+
 wandering-trader:
   # How many offers should be added to each wandering trader's list.
   min-offers: 5

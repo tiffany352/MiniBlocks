@@ -1,11 +1,9 @@
 package com.tiffnix.miniblocks;
 
-import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -100,16 +98,7 @@ public class TradesTable {
             final Material buy1 = Material.EMERALD;
             final Material buy2 = Material.AIR;
 
-            ItemStack sell = new ItemStack(Material.PLAYER_HEAD);
-            final ItemMeta meta = sell.getItemMeta();
-            assert meta != null;
-            meta.setDisplayName("§r§e" + player.name);
-            sell.setItemMeta(meta);
-            NBTItem nbtItem = new NBTItem(sell);
-            NBTCompound owner = nbtItem.addCompound("SkullOwner");
-            owner.setString("Name", player.name);
-            owner.setUUID("Id", UUID.fromString(player.uuid));
-            sell = nbtItem.getItem();
+            final ItemStack sell = HeadUtil.createPlayerHead("§r§e" + player.name, null, player.name, UUID.fromString(player.uuid));
 
             entries.add(new TradeEntry(buy1, buy2, sell, MiniBlocks.INSTANCE.traderPlayerMaxTrades));
         }

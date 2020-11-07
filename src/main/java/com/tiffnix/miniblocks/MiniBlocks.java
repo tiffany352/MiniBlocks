@@ -43,6 +43,11 @@ public final class MiniBlocks extends JavaPlugin {
     boolean fixPlayerHeadNames = false;
     boolean fixMobHeadNames = false;
 
+    // Player heads
+    boolean playerHeadsEnabled = false;
+    String playerHeadsNameFormat = null;
+    List<String> playerHeadsLoreFormat = new ArrayList<>();
+
     // Wandering trader
     int traderMinOffers = 3;
     int traderMaxOffers = 5;
@@ -170,6 +175,10 @@ public final class MiniBlocks extends JavaPlugin {
 
         fixPlayerHeadNames = config.getBoolean("head-name-fix.player-heads", true);
         fixMobHeadNames = config.getBoolean("head-name-fix.mob-heads", true);
+
+        playerHeadsEnabled = config.getBoolean("player-heads.enabled", false);
+        playerHeadsNameFormat = config.getString("player-heads.name-format", "§r§e%player_name%'s Head");
+        playerHeadsLoreFormat = config.getStringList("player-heads.lore-format");
 
         traderMinOffers = config.getInt("wandering-trader.min-offers", 3);
         traderMaxOffers = config.getInt("wandering-trader.max-offers", 5);
