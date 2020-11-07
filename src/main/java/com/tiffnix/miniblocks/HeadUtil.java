@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 package com.tiffnix.miniblocks;
 
 import com.google.gson.Gson;
@@ -34,10 +38,12 @@ public class HeadUtil {
         }
         Logger logger = MiniBlocks.INSTANCE.getLogger();
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString()).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(
+                    "https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString()).openConnection();
             connection.connect();
             if (connection.getResponseCode() == 200) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
                 Gson gson = new Gson();
                 JsonObject object = gson.fromJson(reader, JsonObject.class);
                 JsonArray properties = object.get("properties").getAsJsonArray();
@@ -45,7 +51,8 @@ public class HeadUtil {
                     JsonObject property = item.getAsJsonObject();
                     JsonElement name = property.get("name");
                     if (name != null && name.getAsString().equalsIgnoreCase("textures")) {
-                        // The timestamp field needs to be removed so that heads will stack across server restarts.
+                        // The timestamp field needs to be removed so that heads will stack across
+                        // server restarts.
                         String base64 = property.get("value").getAsString();
                         String json = new String(Base64.decode(base64), StandardCharsets.UTF_8);
                         JsonObject texture = gson.fromJson(json, JsonObject.class);
@@ -57,7 +64,8 @@ public class HeadUtil {
                     }
                 }
             } else {
-                logger.warning("sessionserver.mojang.com returned " + connection.getResponseCode() + " " + connection.getResponseMessage() + ", failed to fetch player skin");
+                logger.warning("sessionserver.mojang.com returned " + connection.getResponseCode() + " "
+                        + connection.getResponseMessage() + ", failed to fetch player skin");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,7 +73,8 @@ public class HeadUtil {
         return null;
     }
 
-    public static ItemStack createPlayerHead(String itemName, List<String> itemLore, String playerName, UUID playerUuid) {
+    public static ItemStack createPlayerHead(String itemName, List<String> itemLore, String playerName,
+            UUID playerUuid) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
 
         ItemMeta meta = item.getItemMeta();

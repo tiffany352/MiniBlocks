@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 package com.tiffnix.miniblocks;
 
 import de.tr7zw.nbtapi.NBTContainer;
@@ -98,7 +102,8 @@ public class TradesTable {
             final Material buy1 = Material.EMERALD;
             final Material buy2 = Material.AIR;
 
-            final ItemStack sell = HeadUtil.createPlayerHead("§r§e" + player.name, null, player.name, UUID.fromString(player.uuid));
+            final ItemStack sell = HeadUtil.createPlayerHead("§r§e" + player.name, null, player.name,
+                    UUID.fromString(player.uuid));
 
             entries.add(new TradeEntry(buy1, buy2, sell, MiniBlocks.INSTANCE.traderPlayerMaxTrades));
         }

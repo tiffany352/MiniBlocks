@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 package com.tiffnix.miniblocks;
 
 import org.bukkit.Location;
@@ -107,11 +111,15 @@ public class PluginListener implements Listener {
         }
 
         final String itemName = applyFormatting(MiniBlocks.INSTANCE.playerHeadsNameFormat, player, killer);
-        final List<String> itemLore = MiniBlocks.INSTANCE.playerHeadsLoreFormat.stream().map(format -> applyFormatting(format, player, killer)).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
+        final List<String> itemLore = MiniBlocks.INSTANCE.playerHeadsLoreFormat.stream()
+                .map(format -> applyFormatting(format, player, killer)).filter(Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayList::new));
 
         final ItemStack item = HeadUtil.createPlayerHead(itemName, itemLore, player);
 
-        // Items are spawned as a runnable to make sure that other plugins can't interfere with the item being dropped on the ground. This is mostly to avoid any possible issues with grave plugins.
+        // Items are spawned as a runnable to make sure that other plugins can't
+        // interfere with the item being dropped on the ground. This is mostly to avoid
+        // any possible issues with grave plugins.
         new SpawnItemJob(item, player.getLocation()).runTask(MiniBlocks.INSTANCE);
     }
 }
