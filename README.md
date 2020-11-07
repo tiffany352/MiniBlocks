@@ -9,21 +9,18 @@ to a Spigot plugin. Currently, it has these:
 - [Player heads drop on death](https://vanillatweaks.net/share#flGepK):
   Incompatible with grave plugins like Gravy, has no config options.
 
-Some of the data packs should be fine though, and don't need to be
-ported to Spigot. These include:
+Some data packs work fine on Spigot and don't need porting. These
+include:
 
 - [More Mob Heads](https://vanillatweaks.net/share#XxZ9nY): The data
   pack contains only loot tables and has no known incompatibilities.
 
-Additionally functionality unrelated to Vanilla Tweaks:
+Additional features unrelated to Vanilla Tweaks:
 
 - Player head name fix: Fixes a bug in Vanilla where player heads lose
   their name and lore text when placed and picked back up.
 - Mob head name fix: The same, but for other head types (creeper, wither
   skeleton, dragon, etc.).
-
-To install these on a Spigot server, put them in the datapacks directory
-inside your primary world (usually called `world`).
 
 ## Setup
 
@@ -37,6 +34,10 @@ explaining what each option does.
 `/miniblocks reload` can be used to safely reload the config while the
 server is running. By default requires operator permissions, this can be
 changed using the `miniblocks.manage` permission.
+
+Other Vanilla Tweaks data packs may be added alongside this plugin. To
+install them on Spigot/Paper, put them in `world/datapacks`. This folder
+is global for all worlds/dimensions on your server.
 
 ## Credits
 
