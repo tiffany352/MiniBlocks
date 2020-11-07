@@ -45,6 +45,7 @@ public final class MiniBlocks extends JavaPlugin {
 
     // Player heads
     boolean playerHeadsEnabled = false;
+    boolean playerHeadsRequirePlayerKill = false;
     String playerHeadsNameFormat = null;
     List<String> playerHeadsLoreFormat = new ArrayList<>();
 
@@ -177,6 +178,7 @@ public final class MiniBlocks extends JavaPlugin {
         fixMobHeadNames = config.getBoolean("head-name-fix.mob-heads", true);
 
         playerHeadsEnabled = config.getBoolean("player-heads.enabled", false);
+        playerHeadsRequirePlayerKill = config.getBoolean("player-heads.player-kill-required", false);
         playerHeadsNameFormat = config.getString("player-heads.name-format", "§r§e%player_name%'s Head");
         playerHeadsLoreFormat = config.getStringList("player-heads.lore-format");
 

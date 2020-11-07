@@ -102,6 +102,10 @@ public class PluginListener implements Listener {
         final Player player = event.getEntity();
         final Player killer = player.getKiller();
 
+        if (killer == null && MiniBlocks.INSTANCE.playerHeadsRequirePlayerKill) {
+            return;
+        }
+
         final String itemName = applyFormatting(MiniBlocks.INSTANCE.playerHeadsNameFormat, player, killer);
         final List<String> itemLore = MiniBlocks.INSTANCE.playerHeadsLoreFormat.stream().map(format -> applyFormatting(format, player, killer)).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
 

@@ -7,7 +7,15 @@ head-name-fix:
   mob-heads: true
 
 player-heads:
+  # Player heads will drop on death.
   enabled: true
+
+  # Whether or not to require a player kill to drop heads - otherwise they will always drop.
+  player-kill-required: true
+
+  # Format strings for the name and lore text. %player_name% is the
+  # player who died, %killer_name% is who killed them. If there was no
+  # killer, that line of text will be skipped.
   name-format: §r§e%player_name%'s Head
   lore-format:
     - Killed by §r§e%killer_name%
@@ -24,7 +32,8 @@ wandering-trader:
     # Whether HermitCraft members should be listed.
     hermit-craft-members: false
 
-    # Uncomment to add custom members to include as head trades. You can use <https://mcuuid.net/> to look up UUIDs for this.
+    # Uncomment to add custom members to include as head trades. You can
+    # use <https://mcuuid.net/> to look up UUIDs for this.
 
     #custom-members:
     #  - name: Tiffnix
