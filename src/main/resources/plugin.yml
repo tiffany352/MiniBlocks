@@ -9,9 +9,25 @@ description: A port of VanillaTweaks' player heads data packs to Spigot
 commands:
   miniblocks:
     description: Manage the MiniBlocks configuration
-    usage: /miniblocks reload
-    permission: miniblocks.manage
+    usage: "Usage: /miniblocks [reload|player|get]"
+    permission: miniblocks.command
 permissions:
-  miniblocks.manage:
-    description: Allows changing MiniBlocks config using /miniblocks command
+  miniblocks.*:
+    description: Enable all permissions for the plugin.
+    default: false
+    children:
+      miniblocks.command.manage: true
+      miniblocks.command.give: true
+  miniblocks.command:
+    description: Whether the /miniblocks command is visible.
     default: op
+  miniblocks.command.manage:
+    description: Allows changing MiniBlocks config using /miniblocks.
+    default: op
+    children:
+      miniblocks.command: true
+  miniblocks.command.give:
+    description: Allows players to give themselves heads based on players or trades using /miniblocks.
+    default: op
+    children:
+      miniblocks.command: true

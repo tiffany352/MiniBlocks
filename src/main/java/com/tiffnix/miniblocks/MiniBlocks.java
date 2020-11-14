@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.TileState;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -167,7 +168,9 @@ public final class MiniBlocks extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PluginListener(), this);
 
-        Objects.requireNonNull(this.getCommand("miniblocks")).setExecutor(new MiniBlockCommand());
+        PluginCommand command = Objects.requireNonNull(this.getCommand("miniblocks"));
+        command.setExecutor(new MiniBlockCommand());
+        command.setTabCompleter(new MiniBlocksCompleter());
     }
 
     @Override

@@ -6,8 +6,10 @@ package com.tiffnix.miniblocks;
 
 import de.tr7zw.nbtapi.NBTContainer;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -37,6 +39,16 @@ public class TradesTable {
             String buy1Str = buy1 != null ? buy1.getKey().toString() : "null";
             String buy2Str = buy2 != null ? buy2.getKey().toString() : "null";
             return "TradeEntry(" + buy1Str + " + " + buy2Str + " -> " + sell.toString() + ")";
+        }
+
+        public String getColorName() {
+            ItemMeta meta = sell.getItemMeta();
+            assert meta != null;
+            return meta.getDisplayName();
+        }
+
+        public String getPlainName() {
+            return ChatColor.stripColor(getColorName());
         }
     }
 
@@ -123,6 +135,50 @@ public class TradesTable {
         }
 
         return list;
+    }
+
+    public List<TradeEntry> findMatches(List<String> terms) {
+        class ScoredMatch {
+            final TradeEntry entry;
+            final int score;
+            final String name;
+
+            ScoredMatch(TradeEntry entry, int score, String name) {
+                this.entry = entry;
+                this.score = score;
+                this.name = name;
+            }
+        }
+
+        ArrayList<ScoredMatch> matches = new ArrayList<>();
+        terms = terms.stream().map(String::toLowerCase).collect(Collectors.toList());
+        String termsStr = String.join(" ", terms);
+
+        for (TradeEntry entry : entries) {
+            String name = entry.getPlainName().toLowerCase();
+            int score = 0;
+            if (name.equals(termsStr)) {
+                score = Integer.MIN_VALUE;
+            } else {
+                for (String term : terms) {
+                    if (name.contains(term)) {
+                        score -= 1;
+                        break;
+                    }
+                }
+            }
+            if (score < 0) {
+                matches.add(new ScoredMatch(entry, score, name));
+            }
+        }
+
+        return matches.stream().sorted((left, right) -> {
+            int score1 = Integer.compare(left.score, right.score);
+            if (score1 != 0) {
+                return score1;
+            }
+            return String.CASE_INSENSITIVE_ORDER.compare(left.name, right.name);
+        }).limit(25).map(match -> match.entry).collect(Collectors.toList());
     }
 
     public long size() {

@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
@@ -23,6 +22,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,11 +54,11 @@ public class HeadUtil {
                         // The timestamp field needs to be removed so that heads will stack across
                         // server restarts.
                         String base64 = property.get("value").getAsString();
-                        String json = new String(Base64.decode(base64), StandardCharsets.UTF_8);
+                        String json = new String(Base64.getDecoder().decode(base64), StandardCharsets.UTF_8);
                         JsonObject texture = gson.fromJson(json, JsonObject.class);
                         texture.remove("timestamp");
                         String newJson = gson.toJson(texture);
-                        String result = Base64.encode(newJson.getBytes(StandardCharsets.UTF_8));
+                        String result = Base64.getEncoder().encodeToString(newJson.getBytes(StandardCharsets.UTF_8));
                         playerSkinCache.put(uuid, result);
                         return result;
                     }
