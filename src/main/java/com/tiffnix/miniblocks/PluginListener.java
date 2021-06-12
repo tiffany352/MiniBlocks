@@ -37,8 +37,7 @@ public class PluginListener implements Listener {
         public void run() {
             final World world = spawnLocation.getWorld();
             assert world != null;
-            Item item = (Item) world.spawnEntity(spawnLocation, EntityType.DROPPED_ITEM);
-            item.setItemStack(itemStack);
+            world.dropItemNaturally(spawnLocation, itemStack);
         }
     }
 

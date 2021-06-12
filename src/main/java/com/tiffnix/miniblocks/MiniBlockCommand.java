@@ -9,7 +9,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -127,8 +126,7 @@ public class MiniBlockCommand implements CommandExecutor {
     }
 
     private void giveItem(Player player, ItemStack item) {
-        Item entity = (Item) player.getWorld().spawnEntity(player.getEyeLocation(), EntityType.DROPPED_ITEM);
-        entity.setItemStack(item.clone());
+        Item entity = player.getWorld().dropItem(player.getEyeLocation(), item.clone());
         entity.setPickupDelay(0);
         entity.setThrower(player.getUniqueId());
         entity.setVelocity(player.getEyeLocation().getDirection());
